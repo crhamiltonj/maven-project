@@ -10,7 +10,20 @@ pipeline {
         pollSCM('* * * * *')
     }
 
-    stage ('Deployments'){
+    stages {
+        stage('Build'){
+            steps {
+                sh 'mvn clean package'
+            }
+            post {
+                success {
+                    echo 'Now Archiving...'
+                    archiveArtifacts: '**/target/*.war'
+                }
+            }
+
+        }
+        stage ('Deployments'){
         parallel{
             stage ('Deploy to Staging'){
                 steps {
@@ -24,5 +37,6 @@ pipeline {
                 }
             }
         }
+    }
     }
 }
